@@ -91,6 +91,6 @@ Para a implementação da solução em larga escala, recomenda‑se a seguinte s
 - **Aplicativos web e móveis:** construídos com frameworks modernos como **React** (web) e **Flutter** ou **React Native** (móvel).  Esses clientes consomem as APIs expostas pelos microserviços e utilizam serviços de notificação push (Firebase Cloud Messaging, Apple Push Notification Service) para alertas.
 - **Infraestrutura em nuvem:** hospedagem em provedores como AWS, Azure ou Google Cloud, com auto‑scaling, balanceamento de carga, rede privada virtual (VPC) e mecanismos de segurança (WAF, firewall).  Serviços gerenciados de banco de dados e mensageria reduzem a complexidade operacional.
 
-## Reflexão final
+## Conclusão da análise de expansão para 10 000 casas
 
 Ao escalar a automação de uma casa para **10 000 casas**, a modelagem deixa de focar apenas em entidades internas (cômodos, sensores, atuadores) e passa a considerar **processos de negócio**, **governança de dados** e **infraestrutura**.  A introdução de uma **plataforma SaaS** implica tratar aspectos de multi‑inquilino, isolamento, orquestração e integração com terceiros.  A arquitetura resultante combina **edge computing** (controladores locais) com **serviços de nuvem** escaláveis, garante tempo de resposta adequado e mantém a privacidade dos moradores.  Essa estrutura modular também permite incorporar novos serviços (por exemplo, controle de climatização, gestão de energia) de forma incremental, apoiando o crescimento sustentável da startup.
