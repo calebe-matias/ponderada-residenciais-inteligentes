@@ -2,22 +2,22 @@
 
 ## Contexto do estudo de caso
 
-O professor propôs um estudo de caso no qual uma **startup** fornece automação para casas, oferecendo iluminação automática por presença, **detecção de invasões com alarmes**, desligamento automático das luzes, controle remoto de portões e observabilidade por dispositivos móveis.  A partir dos diagramas fornecidos em sala para uma única casa, deveríamos **escalar a solução para 10 000 casas** coordenadas por uma *plataforma digital como serviço* (SaaS) e discutir como a modelagem mudaria.
+Foi prosto à turma um estudo de caso no qual uma startup fornece automação para casas, oferecendo iluminação automática por presença, detecção de invasões com alarmes, desligamento automático das luzes, controle remoto de portões e observabilidade por dispositivos móveis.  A partir dos diagramas fornecidos em sala para uma única casa, deveríamos **escalar a solução para 10 000 casas** coordenadas por uma *plataforma digital como serviço* (SaaS) e analisar como a modelagem mudaria.
 
-O problema deixa de ser de um único apartamento isolado e passa a envolver **multi‑inquilinos**, integração com diversas unidades habitacionais, volume massivo de eventos e requisitos de segurança, privacidade e disponibilidade mais rigorosos. A seguir apresento uma modelagem de requisitos com base nas 5 visões propostas pela RM‑ODP.
+O problema deixa de ser de um único apartamento isolado e passa a envolver múltiplos componentes, integração com diversas casas, volume massivo de eventos e requisitos de segurança, privacidade e disponibilidade. Abaixo está uma modelagem de requisitos com base nas 5 visões propostas pela RM‑ODP (e avaliadas na ponderada)
 
 ## Visão 1 – Business Drivers (processo de negócios)
 
 Para escalar a automação, a startup oferece uma **plataforma SaaS** que orquestra o ciclo de vida das casas e dispositivos.  O processo macro envolve os seguintes passos:
 
-1. **Cadastro e provisão de casas/usuários:** o síndico registra unidades habitacionais e moradores; a plataforma provisiona um *controlador local* por casa e associa sensores e atuadores.
+1. **Cadastro e provisão de casas/usuários:** o síndico (podemos supor) registra unidades habitacionais e moradores; a plataforma provisiona um *controlador local* por casa e associa sensores e atuadores.
 2. **Rotina diária:** quando um morador se aproxima da portaria, o aplicativo consulta permissões na plataforma, abre o portão e atualiza o controle local. Ao entrar em um cômodo, sensores de passagem e presença enviam eventos; o controle local acende ou apaga as luzes, registra o evento localmente e o replica para a plataforma.
 3. **Monitoramento e respostas:** a plataforma coleta logs, gera relatórios, executa rotinas de detecção de invasão e envia notificações (SMS, push ou e‑mail) para usuários e segurança do condomínio em caso de anomalias.
 4. **Comando remoto:** moradores usam o aplicativo web/móvel para consultar o status da casa, acionar atuadores (luzes, portão) ou configurar automatizações. A plataforma autentica, autoriza e encaminha os comandos ao respectivo controlador local.
 
-A figura a seguir resume esse fluxo em um diagrama de processo simplificado para milhares de casas.  A plataforma central se comunica com controladores locais, que por sua vez gerenciam sensores e atuadores, enquanto os usuários interagem via aplicativo.  Logs e alertas são enviados para bancos de dados e serviços de notificação.
+A figura a seguir resume esse fluxo em um diagrama de processo (BPMN) simplificado para milhares de casas.  A plataforma central se comunica com controladores locais, que por sua vez gerenciam sensores e atuadores, enquanto os usuários interagem via aplicativo.  Logs e alertas são enviados para bancos de dados e serviços de notificação.
 
-![alt text](1-diagrama-de-processos.png)
+![Diagrama BPMN](1-diagrama-de-processos-BPMN.png)
 
 
 ## Visões 2 e 3 – Requisitos funcionais e não funcionais em UML
@@ -75,10 +75,10 @@ Para suportar os requisitos não funcionais, a arquitetura foi decomposta em com
 
 
 - **Camada de Interface (IHC):** composta por um portal web (para administração do condomínio e moradores) e aplicativos móveis para os usuários finais.  Essas interfaces comunicam‑se com a plataforma via APIs seguras (HTTPS).  Autenticação e autorização são federadas, permitindo perfis e permissões diferentes.
-- **Camada de Controle (Serviços):** reúne microserviços independentes, escaláveis e implícitos em contêineres.  O **Serviço de Automação** implementa regras de acendimento e desligamento, além de agendamentos; o **Serviço de Dispositivos** gerencia o ciclo de vida de sensores e atuadores, monitorando status e atualizando firmware; o **Serviço de Segurança** trata detecção de invasões e alarmes, podendo integrar‑se à portaria ou à polícia.  Cada serviço se comunica via mensageria assíncrona (e.g., Kafka, RabbitMQ) para desacoplar produtores e consumidores de eventos.
-- **Camada de Dados:** bancos de dados diferentes para domínios distintos.  Uma base relacional armazena metadados de casas, cômodos e dispositivos; bases NoSQL e time‑series mantêm logs de eventos, presença e consumo.  A replicação geográfica garante alta disponibilidade e baixa latência.
-- **Camada de Integração:** implementa a comunicação com dispositivos IoT usando **MQTT** ou **CoAP**, traduzindo mensagens em objetos de domínio.  Outros adaptadores integram‑se a sistemas de portaria, serviços de emergência e plataformas de notificação (SMS, e‑mail, push).  Um serviço de mensageria central pode ser usado para orquestrar fluxos complexos e escalonar tarefas.
-- **Controlador Local (Edge Device):** cada casa possui um dispositivo embarcado responsável por interagir diretamente com os sensores e atuadores por meio de protocolos como ZigBee, Z‑Wave ou Wi‑Fi.  O controlador executa as regras básicas mesmo sem internet e mantém uma fila de eventos para sincronizar com a plataforma quando a conexão retorna.
+- **Camada de Controle (Serviços):** reúne microserviços independentes, escaláveis e implícitos em contêineres.  O **Serviço de Automação** implementa regras de acendimento e desligamento, além de agendamentos; o **Serviço de Dispositivos** gerencia o ciclo de vida de sensores e atuadores, monitorando status e atualizando firmware; o **Serviço de Segurança** trata detecção de invasões e alarmes, podendo integrar‑se à portaria ou à polícia.
+- **Camada de Dados:** bancos de dados diferentes para domínios distintos.  Uma base relacional armazena metadados de casas, cômodos e dispositivos; bases NoSQL mantêm logs de eventos, presença e consumo.  A replicação geográfica garante alta disponibilidade e baixa latência.
+- **Camada de Integração:** implementa a comunicação com dispositivos IoT usando **MQTT**, traduzindo mensagens em objetos de domínio.  Outros adaptadores integram‑se a sistemas de portaria, serviços de emergência e plataformas de notificação (SMS, e‑mail, push).  Um serviço de mensageria central pode ser usado para orquestrar fluxos complexos e escalonar tarefas.
+- **Controlador Local (Edge Device):** cada casa possui um dispositivo embarcado responsável por interagir diretamente com os sensores e atuadores por meio de protocolos como ZigBee, Z‑Wave ou Wi‑Fi.  O controlador executa as regras básicas mesmo sem internet e mantém uma fila de eventos para sincronizar com a plataforma quando a conexão retorna. (**Desta forma, temos certeza de que o sistema funciona mesmo sem conexão com a internet**)
 
 Essas decisões de engenharia atendem aos requisitos de **escalabilidade**, **tolerância a falhas** e **segurança**: microserviços e bancos particionados permitem crescimento horizontal; a separação entre controlador local e plataforma reduz a dependência da nuvem; e a mensageria assíncrona absorve picos de eventos sem bloqueios.
 
