@@ -71,7 +71,7 @@ Os principais casos de uso foram representados por diagramas de sequência.  A s
 
 Para suportar os requisitos não funcionais, a arquitetura foi decomposta em componentes e mecanismos, como ilustra o diagrama abaixo.  A solução segue princípios de **microserviços** e **edge computing**:
 
- ![alt text](image.png)
+ ![alt text](6-arquitetura.png)
 
 
 - **Camada de Interface (IHC):** composta por um portal web (para administração do condomínio e moradores) e aplicativos móveis para os usuários finais.  Essas interfaces comunicam‑se com a plataforma via APIs seguras (HTTPS).  Autenticação e autorização são federadas, permitindo perfis e permissões diferentes.
